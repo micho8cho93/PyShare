@@ -86,6 +86,101 @@ print(f"Factorial of 5 is {factorial(5)}")
 - Supports most Python standard library modules
 - No server required – everything runs locally in your browser
 
+## Interactive Programming with input()
+
+### 🎮 Creating Interactive Programs
+
+PyShare supports Python's `input()` function, allowing you to create interactive programs that request user input during execution.
+
+**How it works:**
+1. Write Python code that uses `input()` to ask for user input
+2. Run the code using the "Run Python" button
+3. When `input()` is called, a modal dialog appears
+4. Enter your response and click "Submit" (or press Enter)
+5. The program continues with your input
+
+**Example:**
+```python
+name = input("What's your name? ")
+age = int(input("How old are you? "))
+
+print(f"Hello {name}!")
+print(f"You are {age} years old.")
+
+if age >= 18:
+    print("You are an adult.")
+else:
+    print("You are a minor.")
+```
+
+### 📝 Input Dialog Features
+
+- **Custom prompts**: The text passed to `input()` is displayed in the dialog
+- **Real-time output**: Prompts and responses appear in the output console as they happen
+- **Multiple inputs**: Programs can call `input()` multiple times
+- **Cancellation**: Click "Cancel", press ESC, or click outside to abort execution
+- **Keyboard support**: Press Enter to submit, ESC to cancel
+
+### 🎯 Try It Out
+
+Click menu → **"Interactive Example"** to load a ready-to-run interactive program!
+
+### 💡 Interactive Programming Ideas
+
+**Quiz Game:**
+```python
+score = 0
+
+answer1 = input("What is 2 + 2? ")
+if answer1 == "4":
+    print("Correct!")
+    score += 1
+else:
+    print("Wrong! The answer is 4")
+
+answer2 = input("What is the capital of France? ")
+if answer2.lower() == "paris":
+    print("Correct!")
+    score += 1
+else:
+    print("Wrong! The answer is Paris")
+
+print(f"\nYour score: {score}/2")
+```
+
+**Simple Calculator:**
+```python
+num1 = float(input("Enter first number: "))
+operator = input("Enter operator (+, -, *, /): ")
+num2 = float(input("Enter second number: "))
+
+if operator == "+":
+    result = num1 + num2
+elif operator == "-":
+    result = num1 - num2
+elif operator == "*":
+    result = num1 * num2
+elif operator == "/":
+    result = num1 / num2 if num2 != 0 else "Error: Division by zero"
+else:
+    result = "Invalid operator"
+
+print(f"Result: {result}")
+```
+
+**User Registration:**
+```python
+print("=== User Registration ===")
+username = input("Choose a username: ")
+email = input("Enter your email: ")
+password = input("Create a password: ")
+
+print(f"\n✓ Account created!")
+print(f"Username: {username}")
+print(f"Email: {email}")
+print(f"Password: {'*' * len(password)}")
+```
+
 ## URL Sharing Functionality
 
 ### 🔗 Share Your Python Code

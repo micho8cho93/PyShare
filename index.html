@@ -631,6 +631,550 @@
   .lint-warning:hover .lint-tooltip {
     visibility: visible;
   }
+
+  /* Snippets panel styles */
+  #snippets-panel {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 200ms ease-in-out;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 400px;
+    height: 100vh;
+    background: var(--elevated);
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    font-family: system-ui;
+    font-size: 14px;
+    z-index: 4;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    #snippets-panel {
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  @media (max-width: 640px) {
+    #snippets-panel {
+      width: 100%;
+      left: 0;
+      border-left: none;
+    }
+  }
+
+  #snippets-panel.visible {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  #snippets-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    background: var(--elevated);
+    z-index: 1;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    #snippets-panel-header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  #snippets-panel-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  #snippets-panel-close {
+    background: none;
+    border: none;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 24px;
+    padding: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    outline: none;
+  }
+
+  #snippets-panel-close:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    #snippets-panel-close:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  #snippets-panel-close:focus-visible {
+    outline: 2px solid var(--outline);
+  }
+
+  #new-snippet-btn {
+    margin: 12px 16px;
+    padding: 10px 16px;
+    background: #0569fa;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.2s;
+    width: calc(100% - 32px);
+  }
+
+  #new-snippet-btn:hover {
+    background: #3c86f3;
+  }
+
+  #new-snippet-btn:focus-visible {
+    outline: 2px solid var(--outline);
+    outline-offset: 2px;
+  }
+
+  #snippets-list {
+    padding: 0 16px 16px 16px;
+  }
+
+  .snippet-item {
+    background: var(--elevated);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .snippet-item {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+  }
+
+  .snippet-item:hover {
+    border-color: #0569fa;
+    box-shadow: 0 2px 8px rgba(5, 105, 250, 0.15);
+  }
+
+  .snippet-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .snippet-item-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .snippet-item-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .snippet-btn {
+    background: none;
+    border: none;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    outline: none;
+    transition: background-color 0.2s;
+  }
+
+  .snippet-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .snippet-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  .snippet-btn:focus-visible {
+    outline: 2px solid var(--outline);
+  }
+
+  .snippet-btn-insert {
+    color: #0569fa;
+    font-weight: 600;
+  }
+
+  .snippet-btn-edit {
+    color: #6a737d;
+  }
+
+  .snippet-btn-delete {
+    color: #d73a49;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .snippet-btn-delete {
+      color: #ff7b72;
+    }
+  }
+
+  .snippet-item-preview {
+    font-family: monospace;
+    font-size: 12px;
+    color: #6a737d;
+    white-space: pre;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 48px;
+    line-height: 1.4;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .snippet-item-preview {
+      color: #8b949e;
+    }
+  }
+
+  /* Snippet modal styles */
+  #snippet-modal {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 200ms ease-in-out;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    padding: 20px;
+  }
+
+  #snippet-modal.visible {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  #snippet-modal-content {
+    background: var(--elevated);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  #snippet-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    #snippet-modal-header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  #snippet-modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  #snippet-modal-close {
+    background: none;
+    border: none;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 24px;
+    padding: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    outline: none;
+  }
+
+  #snippet-modal-close:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    #snippet-modal-close:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  #snippet-modal-close:focus-visible {
+    outline: 2px solid var(--outline);
+  }
+
+  #snippet-modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  #snippet-modal-body label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  #snippet-name-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: system-ui;
+    margin-bottom: 16px;
+    outline: none;
+    background: var(--elevated);
+    color: var(--text);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    #snippet-name-input {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  #snippet-name-input:focus {
+    border-color: #0569fa;
+    box-shadow: 0 0 0 3px rgba(5, 105, 250, 0.1);
+  }
+
+  #snippet-code-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: monospace;
+    resize: vertical;
+    outline: none;
+    background: var(--elevated);
+    color: var(--text);
+    line-height: 1.5;
+    tab-size: 4;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    #snippet-code-input {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  #snippet-code-input:focus {
+    border-color: #0569fa;
+    box-shadow: 0 0 0 3px rgba(5, 105, 250, 0.1);
+  }
+
+  #snippet-modal-footer {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    #snippet-modal-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  .modal-btn-secondary,
+  .modal-btn-primary {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .modal-btn-secondary {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .modal-btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  .modal-btn-secondary:hover {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .modal-btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+  }
+
+  .modal-btn-primary {
+    background: #0569fa;
+    color: #fff;
+  }
+
+  .modal-btn-primary:hover {
+    background: #3c86f3;
+  }
+
+  .modal-btn-secondary:focus-visible,
+  .modal-btn-primary:focus-visible {
+    outline: 2px solid var(--outline);
+    outline-offset: 2px;
+  }
+
+  /* Input modal styles */
+  #input-modal {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 200ms ease-in-out;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 6;
+    padding: 20px;
+  }
+
+  #input-modal.visible {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  #input-modal-content {
+    background: var(--elevated);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    animation: slideUp 200ms ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  #input-modal-header {
+    padding: 20px 20px 16px 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    #input-modal-header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  #input-modal-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  #input-modal-body {
+    padding: 20px;
+  }
+
+  #input-modal-field {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: system-ui;
+    outline: none;
+    background: var(--elevated);
+    color: var(--text);
+    transition: border-color 0.2s;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    #input-modal-field {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  #input-modal-field:focus {
+    border-color: #0569fa;
+    box-shadow: 0 0 0 3px rgba(5, 105, 250, 0.15);
+  }
+
+  #input-modal-footer {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    #input-modal-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  }
 </style>
 <article contenteditable="plaintext-only" spellcheck autofocus></article>
 <button id="button" class="noprint">
@@ -691,6 +1235,18 @@
     </svg>
     Run Python
   </button>
+  <button class="item" id="snippets-menu" role="menuitem">
+    <svg aria-hidden="true" focusable="false" width="22" height="22">
+      <use xlink:href="#icon-snippets"></use>
+    </svg>
+    Snippets
+  </button>
+  <button class="item" id="interactive-example" role="menuitem">
+    <svg aria-hidden="true" focusable="false" width="22" height="22">
+      <use xlink:href="#icon-empty"></use>
+    </svg>
+    Interactive Example
+  </button>
   <button class="item" id="theme-toggle" role="menuitem">
     <svg aria-hidden="true" focusable="false" width="22" height="22">
       <use xlink:href="#icon-theme"></use>
@@ -715,6 +1271,46 @@
     <button id="output-console-close" aria-label="Close output console">×</button>
   </div>
   <div id="output-content"></div>
+</div>
+<div id="snippets-panel" class="noprint">
+  <div id="snippets-panel-header">
+    <h3>Code Snippets</h3>
+    <button id="snippets-panel-close" aria-label="Close snippets panel">×</button>
+  </div>
+  <button id="new-snippet-btn" class="snippet-action-btn">+ New Snippet</button>
+  <div id="snippets-list"></div>
+</div>
+<div id="snippet-modal" class="noprint">
+  <div id="snippet-modal-content">
+    <div id="snippet-modal-header">
+      <h3 id="snippet-modal-title">New Snippet</h3>
+      <button id="snippet-modal-close" aria-label="Close modal">×</button>
+    </div>
+    <div id="snippet-modal-body">
+      <label for="snippet-name-input">Snippet Name:</label>
+      <input type="text" id="snippet-name-input" placeholder="Enter snippet name..." />
+      <label for="snippet-code-input">Code:</label>
+      <textarea id="snippet-code-input" placeholder="Enter Python code..." rows="12"></textarea>
+    </div>
+    <div id="snippet-modal-footer">
+      <button id="snippet-modal-cancel" class="modal-btn-secondary">Cancel</button>
+      <button id="snippet-modal-save" class="modal-btn-primary">Save</button>
+    </div>
+  </div>
+</div>
+<div id="input-modal" class="noprint">
+  <div id="input-modal-content">
+    <div id="input-modal-header">
+      <h3 id="input-modal-prompt">Input Required</h3>
+    </div>
+    <div id="input-modal-body">
+      <input type="text" id="input-modal-field" placeholder="Enter your input..." autocomplete="off" />
+    </div>
+    <div id="input-modal-footer">
+      <button id="input-modal-cancel" class="modal-btn-secondary">Cancel</button>
+      <button id="input-modal-submit" class="modal-btn-primary">Submit</button>
+    </div>
+  </div>
 </div>
 <script>
   // Global constants
@@ -748,7 +1344,10 @@
   addEventListener('hashchange', load)
   addEventListener('load', () => new MutationObserver(save).observe(article, {attributeFilter: ['style']}))
   addEventListener('keydown', e => {
-    if ((e.metaKey || e.ctrlKey) && e.code === 'KeyS') {
+    if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.code === 'KeyS') {
+      e.preventDefault()
+      toggleSnippetsPanel()
+    } else if ((e.metaKey || e.ctrlKey) && e.code === 'KeyS') {
       e.preventDefault()
       downloadHTML()
     }
@@ -1390,7 +1989,26 @@
       fileInput.click()
       hideMenu()
     })
-    
+
+    const interactiveExample = document.querySelector('#interactive-example')
+    interactiveExample.addEventListener('click', event => {
+      event.preventDefault()
+      const exampleCode = `name = input("What's your name? ")
+age = int(input("How old are you? "))
+
+print(f"Hello {name}!")
+print(f"You are {age} years old.")
+
+if age >= 18:
+    print("You are an adult.")
+else:
+    print("You are a minor.")`
+      editor.set(exampleCode)
+      save()
+      notify('Interactive example loaded')
+      hideMenu()
+    })
+
     fileInput.addEventListener('change', event => {
       const file = event.target.files[0]
       if (file) {
@@ -1502,22 +2120,71 @@
         // Capture stdout and stderr
         const stdout = []
         const stderr = []
-        
+
         py.setStdout({
-          batched: (text) => stdout.push(text)
+          batched: (text) => {
+            stdout.push(text)
+            // Also show in output console in real-time
+            const currentOutput = outputContent.textContent || ''
+            const errorDiv = outputContent.querySelector('.output-error')
+            if (!errorDiv) {
+              outputContent.textContent = currentOutput + text
+              outputConsole.classList.add('visible')
+            }
+          }
         })
-        
+
         py.setStderr({
           batched: (text) => stderr.push(text)
         })
 
-        // Run the Python code
+        // Set up custom input() function and wrap user code
+        const wrappedCode = `
+import sys
+from js import showInputModal as js_show_input_modal
+
+async def custom_input(prompt_text=""):
+    """Custom input function that uses JavaScript modal"""
+    # Print prompt to stdout (like regular Python input does)
+    if prompt_text:
+        sys.stdout.write(str(prompt_text))
+        sys.stdout.flush()
+
+    try:
+        # Call JavaScript modal and wait for result
+        result = await js_show_input_modal(str(prompt_text))
+        # Print the user's input to stdout
+        sys.stdout.write(str(result) + "\\n")
+        sys.stdout.flush()
+        return str(result)
+    except Exception as e:
+        # User cancelled - raise KeyboardInterrupt
+        sys.stdout.write("\\n")
+        sys.stdout.flush()
+        raise KeyboardInterrupt("Input cancelled by user")
+
+# Override built-in input
+__builtins__.input = custom_input
+
+# Wrap user code in async function to handle input() calls
+async def __main__():
+${code.split('\n').map(line => {
+  // Automatically add 'await' before input() calls
+  // This handles cases like: int(input()), input(), var = input(), etc.
+  return '    ' + line.replace(/\binput\(/g, 'await input(')
+}).join('\n')}
+
+# Execute the wrapped code
+await __main__()
+`
+
+        // Run the wrapped Python code
         try {
-          await py.runPythonAsync(code)
-          
+          await py.runPythonAsync(wrappedCode)
+
           const output = stdout.join('')
           const errors = stderr.join('')
-          
+
           if (errors) {
             showOutput(errors, true)
           } else if (output) {
@@ -1526,7 +2193,13 @@
             showOutput('Code executed successfully (no output)', false)
           }
         } catch (error) {
-          showOutput('Python Error:\n' + error.message, true)
+          // Check if it's a KeyboardInterrupt from cancelled input
+          if (error.message.includes('KeyboardInterrupt') || error.message.includes('Input cancelled')) {
+            const output = stdout.join('')
+            showOutput((output || '') + '\n[Execution cancelled by user]', false)
+          } else {
+            showOutput('Python Error:\n' + error.message, true)
+          }
         }
         
       } catch (error) {
@@ -1628,6 +2301,440 @@ except SyntaxError as e:
     if (articleElement) {
       articleElement.addEventListener('input', debouncedLint)
     }
+
+    // ============ Snippets functionality ============
+    const snippetsPanel = document.querySelector('#snippets-panel')
+    const snippetsPanelClose = document.querySelector('#snippets-panel-close')
+    const snippetsList = document.querySelector('#snippets-list')
+    const newSnippetBtn = document.querySelector('#new-snippet-btn')
+    const snippetsMenu = document.querySelector('#snippets-menu')
+    const snippetModal = document.querySelector('#snippet-modal')
+    const snippetModalClose = document.querySelector('#snippet-modal-close')
+    const snippetModalTitle = document.querySelector('#snippet-modal-title')
+    const snippetNameInput = document.querySelector('#snippet-name-input')
+    const snippetCodeInput = document.querySelector('#snippet-code-input')
+    const snippetModalCancel = document.querySelector('#snippet-modal-cancel')
+    const snippetModalSave = document.querySelector('#snippet-modal-save')
+
+    let currentEditingSnippetId = null
+
+    // Default Python snippets
+    const defaultSnippets = [
+      {
+        id: 'default-1',
+        name: 'Basic Function',
+        code: 'def function_name(param1, param2):\n    """\n    Function description.\n    """\n    # Your code here\n    return result',
+        dateCreated: new Date().toISOString()
+      },
+      {
+        id: 'default-2',
+        name: 'Class Template',
+        code: 'class ClassName:\n    def __init__(self, param1, param2):\n        self.param1 = param1\n        self.param2 = param2\n    \n    def method_name(self):\n        # Your code here\n        pass',
+        dateCreated: new Date().toISOString()
+      },
+      {
+        id: 'default-3',
+        name: 'For Loop with Enumerate',
+        code: 'for index, item in enumerate(items):\n    print(f"{index}: {item}")',
+        dateCreated: new Date().toISOString()
+      },
+      {
+        id: 'default-4',
+        name: 'Try/Except Block',
+        code: 'try:\n    # Code that might raise an exception\n    pass\nexcept Exception as e:\n    print(f"Error: {e}")\nfinally:\n    # Cleanup code\n    pass',
+        dateCreated: new Date().toISOString()
+      },
+      {
+        id: 'default-5',
+        name: 'File Reading (Context Manager)',
+        code: 'with open("filename.txt", "r") as file:\n    content = file.read()\n    # Process content\n    print(content)',
+        dateCreated: new Date().toISOString()
+      },
+      {
+        id: 'default-6',
+        name: 'List Comprehension',
+        code: '# Basic list comprehension\nresult = [item * 2 for item in items]\n\n# With condition\nfiltered = [item for item in items if item > 0]',
+        dateCreated: new Date().toISOString()
+      },
+      {
+        id: 'default-7',
+        name: 'Dictionary Comprehension',
+        code: '# Basic dict comprehension\nresult = {key: value for key, value in pairs}\n\n# With condition\nfiltered = {k: v for k, v in data.items() if v > 0}',
+        dateCreated: new Date().toISOString()
+      },
+      {
+        id: 'default-8',
+        name: 'Decorator Template',
+        code: 'def decorator_name(func):\n    def wrapper(*args, **kwargs):\n        # Code before function call\n        result = func(*args, **kwargs)\n        # Code after function call\n        return result\n    return wrapper\n\n@decorator_name\ndef my_function():\n    pass',
+        dateCreated: new Date().toISOString()
+      },
+      {
+        id: 'default-9',
+        name: 'Main Guard',
+        code: 'if __name__ == "__main__":\n    # Code to run when script is executed directly\n    main()',
+        dateCreated: new Date().toISOString()
+      },
+      {
+        id: 'default-10',
+        name: 'Basic Flask App',
+        code: 'from flask import Flask, render_template, request\n\napp = Flask(__name__)\n\n@app.route("/")\ndef index():\n    return "Hello, World!"\n\n@app.route("/api/data", methods=["GET", "POST"])\ndef api_data():\n    if request.method == "POST":\n        data = request.json\n        return {"status": "success", "data": data}\n    return {"message": "GET request"}\n\nif __name__ == "__main__":\n    app.run(debug=True)',
+        dateCreated: new Date().toISOString()
+      }
+    ]
+
+    // Load snippets from localStorage
+    function loadSnippets() {
+      try {
+        const stored = localStorage.getItem('pyshare-snippets')
+        if (stored) {
+          return JSON.parse(stored)
+        }
+      } catch (e) {
+        console.error('Error loading snippets:', e)
+      }
+      // Return default snippets if none stored
+      return [...defaultSnippets]
+    }
+
+    // Save snippets to localStorage
+    function saveSnippets(snippets) {
+      try {
+        localStorage.setItem('pyshare-snippets', JSON.stringify(snippets))
+      } catch (e) {
+        console.error('Error saving snippets:', e)
+        notifyError('Failed to save snippet')
+      }
+    }
+
+    // Render snippets list
+    function renderSnippets() {
+      const snippets = loadSnippets()
+      snippetsList.innerHTML = ''
+
+      if (snippets.length === 0) {
+        snippetsList.innerHTML = '<div style="padding: 20px; text-align: center; color: #6a737d;">No snippets yet. Create your first snippet!</div>'
+        return
+      }
+
+      snippets.forEach(snippet => {
+        const snippetItem = document.createElement('div')
+        snippetItem.className = 'snippet-item'
+
+        // Get first 3 lines for preview
+        const lines = snippet.code.split('\n')
+        const preview = lines.slice(0, 3).join('\n')
+        const hasMore = lines.length > 3
+
+        snippetItem.innerHTML = `
+          <div class="snippet-item-header">
+            <div class="snippet-item-name">${escapeHtml(snippet.name)}</div>
+            <div class="snippet-item-actions">
+              <button class="snippet-btn snippet-btn-insert" data-id="${snippet.id}">Insert</button>
+              <button class="snippet-btn snippet-btn-edit" data-id="${snippet.id}">Edit</button>
+              <button class="snippet-btn snippet-btn-delete" data-id="${snippet.id}">Delete</button>
+            </div>
+          </div>
+          <div class="snippet-item-preview">${escapeHtml(preview)}${hasMore ? '...' : ''}</div>
+        `
+
+        snippetsList.appendChild(snippetItem)
+      })
+
+      // Add event listeners
+      document.querySelectorAll('.snippet-btn-insert').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation()
+          insertSnippet(btn.dataset.id)
+        })
+      })
+
+      document.querySelectorAll('.snippet-btn-edit').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation()
+          editSnippet(btn.dataset.id)
+        })
+      })
+
+      document.querySelectorAll('.snippet-btn-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation()
+          deleteSnippet(btn.dataset.id)
+        })
+      })
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+      const div = document.createElement('div')
+      div.textContent = text
+      return div.innerHTML
+    }
+
+    // Toggle snippets panel
+    function toggleSnippetsPanel() {
+      const isVisible = snippetsPanel.classList.contains('visible')
+      if (isVisible) {
+        snippetsPanel.classList.remove('visible')
+      } else {
+        snippetsPanel.classList.add('visible')
+        renderSnippets()
+        hideMenu()
+      }
+    }
+
+    // Show snippet modal
+    function showSnippetModal(title, name = '', code = '', snippetId = null) {
+      snippetModalTitle.textContent = title
+      snippetNameInput.value = name
+      snippetCodeInput.value = code
+      currentEditingSnippetId = snippetId
+      snippetModal.classList.add('visible')
+      snippetNameInput.focus()
+    }
+
+    // Hide snippet modal
+    function hideSnippetModal() {
+      snippetModal.classList.remove('visible')
+      snippetNameInput.value = ''
+      snippetCodeInput.value = ''
+      currentEditingSnippetId = null
+    }
+
+    // Insert snippet at cursor position
+    function insertSnippet(snippetId) {
+      const snippets = loadSnippets()
+      const snippet = snippets.find(s => s.id === snippetId)
+      if (!snippet) return
+
+      const selection = window.getSelection()
+      if (!selection.rangeCount) {
+        // No selection, insert at end
+        const currentText = article.textContent
+        article.textContent = currentText + (currentText ? '\n\n' : '') + snippet.code
+      } else {
+        // Insert at cursor or replace selection
+        const range = selection.getRangeAt(0)
+        range.deleteContents()
+        const textNode = document.createTextNode(snippet.code)
+        range.insertNode(textNode)
+
+        // Move cursor to end of inserted text
+        range.setStartAfter(textNode)
+        range.setEndAfter(textNode)
+        selection.removeAllRanges()
+        selection.addRange(range)
+      }
+
+      // Trigger syntax highlighting
+      parsePython(article)
+
+      // Save the updated content
+      save()
+
+      notify(`Inserted: ${snippet.name}`)
+      snippetsPanel.classList.remove('visible')
+    }
+
+    // Edit snippet
+    function editSnippet(snippetId) {
+      const snippets = loadSnippets()
+      const snippet = snippets.find(s => s.id === snippetId)
+      if (!snippet) return
+
+      showSnippetModal('Edit Snippet', snippet.name, snippet.code, snippetId)
+    }
+
+    // Delete snippet
+    function deleteSnippet(snippetId) {
+      if (!confirm('Are you sure you want to delete this snippet?')) return
+
+      let snippets = loadSnippets()
+      snippets = snippets.filter(s => s.id !== snippetId)
+      saveSnippets(snippets)
+      renderSnippets()
+      notify('Snippet deleted')
+    }
+
+    // Save new or edited snippet
+    function saveSnippet() {
+      const name = snippetNameInput.value.trim()
+      const code = snippetCodeInput.value.trim()
+
+      if (!name) {
+        alert('Please enter a snippet name')
+        snippetNameInput.focus()
+        return
+      }
+
+      if (!code) {
+        alert('Please enter snippet code')
+        snippetCodeInput.focus()
+        return
+      }
+
+      let snippets = loadSnippets()
+
+      if (currentEditingSnippetId) {
+        // Edit existing snippet
+        const index = snippets.findIndex(s => s.id === currentEditingSnippetId)
+        if (index !== -1) {
+          snippets[index].name = name
+          snippets[index].code = code
+        }
+      } else {
+        // Create new snippet
+        const newSnippet = {
+          id: 'snippet-' + Date.now(),
+          name: name,
+          code: code,
+          dateCreated: new Date().toISOString()
+        }
+        snippets.push(newSnippet)
+      }
+
+      saveSnippets(snippets)
+      renderSnippets()
+      hideSnippetModal()
+      notify(currentEditingSnippetId ? 'Snippet updated' : 'Snippet created')
+    }
+
+    // Event listeners
+    snippetsMenu.addEventListener('click', (e) => {
+      e.preventDefault()
+      toggleSnippetsPanel()
+    })
+
+    snippetsPanelClose.addEventListener('click', () => {
+      snippetsPanel.classList.remove('visible')
+    })
+
+    newSnippetBtn.addEventListener('click', () => {
+      showSnippetModal('New Snippet')
+    })
+
+    snippetModalClose.addEventListener('click', hideSnippetModal)
+    snippetModalCancel.addEventListener('click', hideSnippetModal)
+    snippetModalSave.addEventListener('click', saveSnippet)
+
+    // Close modal on backdrop click
+    snippetModal.addEventListener('click', (e) => {
+      if (e.target === snippetModal) {
+        hideSnippetModal()
+      }
+    })
+
+    // Handle Enter key in name input
+    snippetNameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        snippetCodeInput.focus()
+      }
+    })
+
+    // Handle Tab key in code textarea
+    snippetCodeInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault()
+        const start = e.target.selectionStart
+        const end = e.target.selectionEnd
+        const value = e.target.value
+        e.target.value = value.substring(0, start) + '    ' + value.substring(end)
+        e.target.selectionStart = e.target.selectionEnd = start + 4
+      }
+    })
+
+    // Make toggleSnippetsPanel available globally for keyboard shortcut
+    window.toggleSnippetsPanel = toggleSnippetsPanel
+
+    // ============ Input modal functionality ============
+    const inputModal = document.querySelector('#input-modal')
+    const inputModalPrompt = document.querySelector('#input-modal-prompt')
+    const inputModalField = document.querySelector('#input-modal-field')
+    const inputModalSubmit = document.querySelector('#input-modal-submit')
+    const inputModalCancel = document.querySelector('#input-modal-cancel')
+
+    let inputModalResolve = null
+    let inputModalReject = null
+
+    // Show input modal and return promise
+    function showInputModal(promptText = '') {
+      return new Promise((resolve, reject) => {
+        inputModalResolve = resolve
+        inputModalReject = reject
+
+        // Set prompt text
+        inputModalPrompt.textContent = promptText || 'Input Required'
+
+        // Clear and focus input field
+        inputModalField.value = ''
+        inputModal.classList.add('visible')
+
+        // Small delay to ensure modal is visible before focusing
+        setTimeout(() => {
+          inputModalField.focus()
+        }, 100)
+      })
+    }
+
+    // Hide input modal
+    function hideInputModal() {
+      inputModal.classList.remove('visible')
+      inputModalField.value = ''
+    }
+
+    // Submit input
+    function submitInput() {
+      const value = inputModalField.value
+      hideInputModal()
+      if (inputModalResolve) {
+        inputModalResolve(value)
+        inputModalResolve = null
+        inputModalReject = null
+      }
+    }
+
+    // Cancel input
+    function cancelInput() {
+      hideInputModal()
+      if (inputModalReject) {
+        inputModalReject(new Error('Input cancelled'))
+        inputModalResolve = null
+        inputModalReject = null
+      }
+    }
+
+    // Event listeners
+    inputModalSubmit.addEventListener('click', submitInput)
+    inputModalCancel.addEventListener('click', cancelInput)
+
+    // Enter key submits
+    inputModalField.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        submitInput()
+      } else if (e.key === 'Escape') {
+        e.preventDefault()
+        cancelInput()
+      }
+    })
+
+    // ESC key cancels
+    inputModal.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        cancelInput()
+      }
+    })
+
+    // Clicking outside modal cancels
+    inputModal.addEventListener('click', (e) => {
+      if (e.target === inputModal) {
+        cancelInput()
+      }
+    })
+
+    // Make showInputModal available globally for Python
+    window.showInputModal = showInputModal
   }
 
   function ripple(event) {
@@ -2107,6 +3214,13 @@ except SyntaxError as e:
           stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
     <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/>
+  </symbol>
+  <symbol id="icon-snippets" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+    <path d="M9 4h3l2 2h5a2 2 0 0 1 2 2v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2"/>
+    <path d="M9 12l6 0"/>
+    <path d="M9 16l6 0"/>
   </symbol>
   <symbol id="icon-empty" viewBox="0 0 24 24"></symbol>
 </svg>
