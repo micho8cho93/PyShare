@@ -65,6 +65,7 @@
     padding: 18px max(18px, calc(50vw - 400px));
     width: 100%;
     min-height: 100dvh;
+    margin-top: 44px;
     font: 18px / 1.5 system-ui;
     tab-size: 4;
     white-space: pre-wrap;
@@ -408,6 +409,152 @@
   #url-size.error {
     color: #ff3b30;
     font-weight: 600;
+  }
+
+  /* Tabs bar styling */
+  #tabs-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 44px;
+    background: var(--elevated);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    z-index: 3;
+    overflow: hidden;
+  }
+
+  html.theme-dark #tabs-bar {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+
+  #tabs-container {
+    display: flex;
+    flex: 1;
+    gap: 4px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+  }
+
+  #tabs-container::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  #tabs-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+  }
+
+  .tab-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 6px 6px 0 0;
+    cursor: pointer;
+    white-space: nowrap;
+    max-width: 200px;
+    min-width: 100px;
+    font-family: system-ui;
+    font-size: 14px;
+    color: var(--text);
+    transition: background 0.15s;
+  }
+
+  .tab-button:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  html.theme-dark .tab-button:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .tab-button.active {
+    background: var(--elevated);
+    border-bottom: 2px solid var(--outline);
+    font-weight: 600;
+  }
+
+  .tab-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tab-close {
+    opacity: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.15s, background 0.15s;
+  }
+
+  .tab-button:hover .tab-close,
+  .tab-button.active .tab-close {
+    opacity: 0.6;
+  }
+
+  .tab-close:hover {
+    opacity: 1 !important;
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  html.theme-dark .tab-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  #new-tab-btn {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 20px;
+    color: var(--text);
+    transition: background 0.15s;
+  }
+
+  #new-tab-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  html.theme-dark #new-tab-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  @media (max-width: 640px) {
+    .tab-button {
+      max-width: 150px;
+      min-width: 80px;
+      padding: 6px 10px;
+      font-size: 13px;
+    }
+
+    #new-tab-btn {
+      width: 28px;
+      height: 28px;
+      font-size: 18px;
+    }
   }
 
   #notification {
@@ -1176,6 +1323,12 @@
     }
   }
 </style>
+<div id="tabs-bar" class="noprint">
+  <div id="tabs-container">
+    <!-- Tabs rendered here by JavaScript -->
+  </div>
+  <button id="new-tab-btn" aria-label="New tab">+</button>
+</div>
 <article contenteditable="plaintext-only" spellcheck autofocus></article>
 <button id="button" class="noprint">
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -1187,12 +1340,12 @@
   </svg>
 </button>
 <div id="menu" class="noprint" role="menu">
-  <a class="item" href="#new" target="_blank" role="menuitem">
+  <button class="item" id="new-document" role="menuitem">
     <svg aria-hidden="true" focusable="false" width="22" height="22">
       <use xlink:href="#icon-plus"></use>
     </svg>
     New document
-  </a>
+  </button>
   <a class="item" id="qr" href="/qr" role="menuitem">
     <svg aria-hidden="true" focusable="false" width="22" height="22">
       <use xlink:href="#icon-qrcode"></use>
@@ -1205,6 +1358,12 @@
     </svg>
     Share document
   </a>
+  <button class="item" id="share-all-tabs" role="menuitem">
+    <svg aria-hidden="true" focusable="false" width="22" height="22">
+      <use xlink:href="#icon-share"></use>
+    </svg>
+    Share All Tabs
+  </button>
   <a class="item" id="save-as-html" href="" role="menuitem">
     <svg aria-hidden="true" focusable="false" width="22" height="22">
       <use xlink:href="#icon-empty"></use>
@@ -1335,72 +1494,59 @@
     }
   }
 
-  // Initialize after functions are defined
-  initUI()
-
-  const article = document.querySelector('article')
-  const editor = new Editor(article, parsePython)
-  
-  article.addEventListener('input', debounce(500, save))
-  article.addEventListener('blur', save)
-  article.addEventListener('click', event => {
-    if (event.target.tagName === 'A') window.open(event.target.getAttribute('href'), '_blank')
-  })
-  addEventListener('DOMContentLoaded', load)
-  addEventListener('hashchange', load)
-  addEventListener('load', () => new MutationObserver(save).observe(article, {attributeFilter: ['style']}))
-  addEventListener('keydown', e => {
-    if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.code === 'KeyS') {
-      e.preventDefault()
-      toggleSnippetsPanel()
-    } else if ((e.metaKey || e.ctrlKey) && e.code === 'KeyS') {
-      e.preventDefault()
-      downloadHTML()
-    }
-  })
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
-  }
-
-  console.log('%cGitHub https://github.com/antonmedv/textarea', 'font-size: 16px; border: 1px solid lightblue; border-radius: 12px; padding: 10px 14px; ')
-
   async function load() {
     try {
-      if (location.hash !== '') await set(location.hash)
+      // Priority 1: Check for tabs in localStorage
+      const tabsData = localStorage.getItem('tabs')
+      if (tabsData) {
+        await tabManager.loadTabs(JSON.parse(tabsData))
+        return
+      }
+
+      // Priority 2: Load from URL hash
+      if (location.hash !== '' && location.hash !== '#new') {
+        await tabManager.loadFromHash(location.hash)
+      }
+      // Priority 3: Migrate from legacy localStorage 'hash'
       else {
-        await set(localStorage.getItem('hash') ?? '')
-        if (article.textContent) history.replaceState({}, '', await get())
+        const legacyHash = localStorage.getItem('hash')
+        if (legacyHash) {
+          await tabManager.loadFromHash('#' + legacyHash)
+        } else {
+          // Priority 4: Create default empty tab
+          tabManager.createTab('untitled-1.py', '')
+        }
       }
     } catch (e) {
-      article.textContent = ''
-      article.removeAttribute('style')
+      console.error('Load error:', e)
+      tabManager.createTab('untitled-1.py', '')
     }
     updateTitle()
   }
 
   async function save() {
-    const hash = await get()
-    
+    // Save all tabs to localStorage
+    tabManager.saveTabs()
+
+    // Update URL hash with active tab only (for normal sharing)
+    const hash = await tabManager.getActiveTabHash()
+
     // Check URL length and warn if necessary
     const fullUrl = location.origin + location.pathname + hash
     const urlLength = fullUrl.length
     cachedUrlLength = urlLength
-    
+
     // Update URL size indicator
     updateUrlSizeIndicator(urlLength, URL_WARN_THRESHOLD, URL_MAX_THRESHOLD)
-    
+
     if (urlLength > URL_MAX_THRESHOLD) {
       showUrlLengthError(urlLength, URL_MAX_THRESHOLD)
       return // Don't save if URL is too long
     } else if (urlLength > URL_WARN_THRESHOLD) {
       showUrlLengthWarning(urlLength)
     }
-    
+
     if (location.hash !== hash) history.replaceState({}, '', hash)
-    try {
-      localStorage.setItem('hash', hash)
-    } catch (e) {
-    }
     updateTitle()
   }
 
@@ -1473,7 +1619,9 @@
   }
 
   async function downloadHTML() {
-    updateTitle()
+    const activeTab = tabManager.getActiveTab()
+    const fileName = activeTab ? activeTab.name.replace(/\.py$/, '') : 'untitled'
+
     const doc = document.documentElement.cloneNode(true)
     doc.querySelectorAll('script').forEach(s => s.remove())
     doc.querySelectorAll('.noprint').forEach(s => s.remove())
@@ -1483,7 +1631,7 @@
     if ('showSaveFilePicker' in window) {
       try {
         const handle = await showSaveFilePicker({
-          suggestedName: document.title + '.html',
+          suggestedName: fileName + '.html',
           types: [{
             description: 'HTML file',
             accept: {'text/html': ['.html']},
@@ -1502,19 +1650,20 @@
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = document.title + '.html'
+    a.download = fileName + '.html'
     a.click()
     URL.revokeObjectURL(url)
   }
 
   async function downloadTXT() {
-    updateTitle()
+    const activeTab = tabManager.getActiveTab()
+    const fileName = activeTab ? activeTab.name.replace(/\.py$/, '') : 'untitled'
     const text = article.textContent
 
     if ('showSaveFilePicker' in window) {
       try {
         const handle = await showSaveFilePicker({
-          suggestedName: document.title + '.txt',
+          suggestedName: fileName + '.txt',
           types: [{
             description: 'TEXT file',
             accept: {'text/plain': ['.txt']},
@@ -1533,19 +1682,20 @@
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = document.title + '.txt'
+    a.download = fileName + '.txt'
     a.click()
     URL.revokeObjectURL(url)
   }
 
   async function downloadPython() {
-    updateTitle()
+    const activeTab = tabManager.getActiveTab()
+    const fileName = activeTab ? activeTab.name : 'untitled.py'
     const text = article.textContent
 
     if ('showSaveFilePicker' in window) {
       try {
         const handle = await showSaveFilePicker({
-          suggestedName: document.title + '.py',
+          suggestedName: fileName,
           types: [{
             description: 'Python file',
             accept: {'text/x-python': ['.py']},
@@ -1564,7 +1714,7 @@
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = document.title + '.py'
+    a.download = fileName
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -1843,6 +1993,8 @@
     const button = document.querySelector('#button')
     const qr = document.querySelector('#qr')
     const shareLink = document.querySelector('#share-link')
+    const newDocument = document.querySelector('#new-document')
+    const shareAllTabs = document.querySelector('#share-all-tabs')
     const saveAsHTML = document.querySelector('#save-as-html')
     const saveAsText = document.querySelector('#save-as-text')
     const saveAsPython = document.querySelector('#save-as-python')
@@ -2026,6 +2178,33 @@
       hideMenu()
     })
 
+    newDocument.addEventListener('click', event => {
+      event.preventDefault()
+      tabManager.createTab(tabManager.generateTabName(), '')
+      hideMenu()
+    })
+
+    shareAllTabs.addEventListener('click', async event => {
+      event.preventDefault()
+      try {
+        const hash = await tabManager.getAllTabsHash()
+        const fullUrl = location.origin + location.pathname + hash
+
+        if (fullUrl.length > URL_MAX_THRESHOLD) {
+          notifyWarning('Too many tabs to share in one URL. Sharing active tab only.')
+          // Fall back to sharing active tab only
+          navigator.clipboard.writeText(location.href)
+        } else {
+          navigator.clipboard.writeText(fullUrl)
+          notify('All tabs link copied')
+        }
+      } catch (e) {
+        console.error('Failed to share all tabs:', e)
+        notifyError('Failed to generate share link')
+      }
+      hideMenu()
+    })
+
     const interactiveExample = document.querySelector('#interactive-example')
     interactiveExample.addEventListener('click', event => {
       event.preventDefault()
@@ -2076,9 +2255,10 @@ print("Plot generated successfully!")`
         const reader = new FileReader()
         reader.onload = function(e) {
           const content = e.target.result
-          editor.set(content)
+          // Create new tab with file name and content
+          tabManager.createTab(file.name, content)
           save()
-          notify('File loaded successfully')
+          notify('File loaded in new tab')
         }
         reader.onerror = function() {
           notifyError('Failed to read file')
@@ -3372,10 +3552,496 @@ except SyntaxError as e:
         return restore(pos)
       },
       destroy() {
-        for (const [type, fn] of listeners) editor.removeEventListener(type, fn)
+        for (const [type, fn] of listeners) element.removeEventListener(type, fn)
       },
     }
   }
+
+  // TabManager class for managing multiple file tabs
+  class TabManager {
+    constructor(articleElement) {
+      this.tabs = []
+      this.activeTabId = null
+      this.article = articleElement
+      this.tabsContainer = document.getElementById('tabs-container')
+      this.newTabBtn = document.getElementById('new-tab-btn')
+      this.nextTabNumber = 1
+
+      // Bind event handlers
+      this.newTabBtn.addEventListener('click', () => this.handleNewTabClick())
+    }
+
+    // Generate unique tab ID
+    generateTabId() {
+      return 'tab-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9)
+    }
+
+    // Generate unique tab name
+    generateTabName() {
+      const name = `untitled-${this.nextTabNumber}.py`
+      this.nextTabNumber++
+      return name
+    }
+
+    // Create a new tab
+    createTab(name, content = '', switchTo = true) {
+      const tabId = this.generateTabId()
+      const editor = new Editor(this.article, parsePython)
+
+      const tab = {
+        id: tabId,
+        name: name || this.generateTabName(),
+        editor: editor,
+        savedContent: content,
+        savedCursorPos: null,
+        lastModified: Date.now()
+      }
+
+      this.tabs.push(tab)
+
+      if (switchTo || this.tabs.length === 1) {
+        this.switchTab(tabId)
+      }
+
+      this.renderTabsBar()
+      this.saveTabs()
+
+      return tab
+    }
+
+    // Switch to a different tab
+    switchTab(tabId) {
+      if (tabId === this.activeTabId) return
+
+      // Save current tab state
+      const currentTab = this.getActiveTab()
+      if (currentTab) {
+        currentTab.savedContent = this.article.textContent
+        currentTab.savedCursorPos = currentTab.editor.save()
+      }
+
+      // Update active tab
+      this.activeTabId = tabId
+      const newTab = this.getActiveTab()
+
+      if (!newTab) return
+
+      // Swap content
+      this.article.textContent = newTab.savedContent || ''
+
+      // Re-apply syntax highlighting
+      parsePython(this.article)
+
+      // Restore cursor position
+      if (newTab.savedCursorPos) {
+        try {
+          newTab.editor.restore(newTab.savedCursorPos)
+        } catch (e) {
+          // Cursor restore may fail if content changed significantly
+          console.warn('Could not restore cursor position:', e)
+        }
+      }
+
+      // Update UI
+      this.updateActiveTab()
+
+      // Save state
+      this.saveTabs()
+
+      // Update title
+      updateTitle()
+    }
+
+    // Close a tab
+    closeTab(tabId) {
+      if (this.tabs.length === 1) {
+        notify('Cannot close the last tab')
+        return
+      }
+
+      const index = this.tabs.findIndex(t => t.id === tabId)
+      if (index === -1) return
+
+      const tab = this.tabs[index]
+
+      // Destroy editor to clean up event listeners
+      if (tab.editor && tab.editor.destroy) {
+        tab.editor.destroy()
+      }
+
+      // Remove from array
+      this.tabs.splice(index, 1)
+
+      // If closing active tab, switch to adjacent tab
+      if (tabId === this.activeTabId) {
+        const newActiveIndex = Math.min(index, this.tabs.length - 1)
+        this.switchTab(this.tabs[newActiveIndex].id)
+      }
+
+      // Update UI and save
+      this.renderTabsBar()
+      this.saveTabs()
+    }
+
+    // Rename a tab
+    renameTab(tabId, newName) {
+      const tab = this.tabs.find(t => t.id === tabId)
+      if (!tab) return
+
+      tab.name = newName || 'untitled.py'
+      tab.lastModified = Date.now()
+
+      this.renderTabsBar()
+      this.saveTabs()
+      updateTitle()
+    }
+
+    // Get active tab
+    getActiveTab() {
+      return this.tabs.find(t => t.id === this.activeTabId)
+    }
+
+    // Get active tab hash for URL
+    async getActiveTabHash() {
+      const tab = this.getActiveTab()
+      if (!tab) return '#'
+
+      const content = this.activeTabId === tab.id ? this.article.textContent : tab.savedContent
+      const style = this.article.getAttribute('style')
+      const data = content + (style ? '\x00' + style : '') + '\x00' + tab.name
+
+      return '#' + await compress(data)
+    }
+
+    // Get all tabs hash for "Share All Tabs" feature
+    async getAllTabsHash() {
+      // Save current tab content first
+      const currentTab = this.getActiveTab()
+      if (currentTab) {
+        currentTab.savedContent = this.article.textContent
+      }
+
+      const tabsData = {
+        tabs: this.tabs.map(tab => ({
+          id: tab.id,
+          name: tab.name,
+          content: tab.id === this.activeTabId ? this.article.textContent : tab.savedContent,
+          lastModified: tab.lastModified
+        })),
+        activeTabId: this.activeTabId
+      }
+
+      const json = JSON.stringify(tabsData)
+      const compressed = await compress(json)
+
+      return '#v2:' + compressed
+    }
+
+    // Load from URL hash
+    async loadFromHash(hash) {
+      if (!hash || hash === '#' || hash === '#new') {
+        this.createTab(this.generateTabName(), '')
+        return
+      }
+
+      const hashContent = hash.slice(1) // Remove #
+
+      try {
+        // Multi-tab format: v2:<compressed_data>
+        if (hashContent.startsWith('v2:')) {
+          const compressed = hashContent.slice(3)
+          const json = await decompress(compressed)
+          const data = JSON.parse(json)
+          await this.loadTabs(data)
+        }
+        // Legacy single-tab format
+        else {
+          const decompressed = await decompress(hashContent)
+          const parts = decompressed.split('\x00')
+          const content = parts[0] || ''
+          const style = parts[1] || null
+          const name = parts[2] || this.generateTabName()
+
+          this.createTab(name, content)
+
+          if (style) {
+            this.article.setAttribute('style', style)
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load from hash:', e)
+        this.createTab(this.generateTabName(), '')
+      }
+    }
+
+    // Save all tabs to localStorage
+    saveTabs() {
+      try {
+        // Save current tab content first
+        const currentTab = this.getActiveTab()
+        if (currentTab) {
+          currentTab.savedContent = this.article.textContent
+        }
+
+        const tabsData = {
+          tabs: this.tabs.map(tab => ({
+            id: tab.id,
+            name: tab.name,
+            content: tab.savedContent || '',
+            lastModified: tab.lastModified
+          })),
+          activeTabId: this.activeTabId
+        }
+
+        localStorage.setItem('tabs', JSON.stringify(tabsData))
+      } catch (e) {
+        console.error('Failed to save tabs to localStorage:', e)
+      }
+    }
+
+    // Load tabs from localStorage data
+    async loadTabs(data) {
+      if (!data || !data.tabs || data.tabs.length === 0) {
+        this.createTab(this.generateTabName(), '')
+        return
+      }
+
+      // Clear existing tabs
+      this.tabs = []
+      this.tabsContainer.innerHTML = ''
+
+      // Create tabs
+      for (const tabData of data.tabs) {
+        const editor = new Editor(this.article, parsePython)
+
+        const tab = {
+          id: tabData.id,
+          name: tabData.name || this.generateTabName(),
+          editor: editor,
+          savedContent: tabData.content || '',
+          savedCursorPos: null,
+          lastModified: tabData.lastModified || Date.now()
+        }
+
+        this.tabs.push(tab)
+
+        // Update nextTabNumber based on existing tabs
+        const match = tab.name.match(/untitled-(\d+)\.py/)
+        if (match) {
+          const num = parseInt(match[1], 10)
+          if (num >= this.nextTabNumber) {
+            this.nextTabNumber = num + 1
+          }
+        }
+      }
+
+      // Set active tab
+      if (data.activeTabId && this.tabs.find(t => t.id === data.activeTabId)) {
+        this.activeTabId = data.activeTabId
+      } else {
+        this.activeTabId = this.tabs[0]?.id
+      }
+
+      // Load active tab content
+      const activeTab = this.getActiveTab()
+      if (activeTab) {
+        this.article.textContent = activeTab.savedContent || ''
+        parsePython(this.article)
+      }
+
+      // Render UI
+      this.renderTabsBar()
+    }
+
+    // Render tabs bar UI
+    renderTabsBar() {
+      this.tabsContainer.innerHTML = ''
+
+      for (const tab of this.tabs) {
+        const tabButton = document.createElement('button')
+        tabButton.className = 'tab-button'
+        if (tab.id === this.activeTabId) {
+          tabButton.classList.add('active')
+        }
+        tabButton.dataset.tabId = tab.id
+
+        const tabName = document.createElement('span')
+        tabName.className = 'tab-name'
+        tabName.textContent = tab.name
+        tabButton.appendChild(tabName)
+
+        const closeBtn = document.createElement('button')
+        closeBtn.className = 'tab-close'
+        closeBtn.textContent = '×'
+        closeBtn.setAttribute('aria-label', 'Close tab')
+        tabButton.appendChild(closeBtn)
+
+        // Event listeners
+        tabButton.addEventListener('click', (e) => {
+          if (e.target === closeBtn) return // Handle close separately
+          this.handleTabClick(tab.id)
+        })
+
+        closeBtn.addEventListener('click', (e) => {
+          e.stopPropagation()
+          this.handleTabClose(tab.id)
+        })
+
+        tabButton.addEventListener('dblclick', (e) => {
+          if (e.target === closeBtn) return
+          this.handleTabDoubleClick(tab.id)
+        })
+
+        tabButton.addEventListener('contextmenu', (e) => {
+          e.preventDefault()
+          this.handleTabContextMenu(tab.id, e)
+        })
+
+        this.tabsContainer.appendChild(tabButton)
+      }
+    }
+
+    // Update active tab styling
+    updateActiveTab() {
+      const buttons = this.tabsContainer.querySelectorAll('.tab-button')
+      buttons.forEach(btn => {
+        if (btn.dataset.tabId === this.activeTabId) {
+          btn.classList.add('active')
+        } else {
+          btn.classList.remove('active')
+        }
+      })
+    }
+
+    // Event handlers
+    handleTabClick(tabId) {
+      this.switchTab(tabId)
+    }
+
+    handleTabClose(tabId) {
+      this.closeTab(tabId)
+    }
+
+    handleTabDoubleClick(tabId) {
+      const tab = this.tabs.find(t => t.id === tabId)
+      if (!tab) return
+
+      const newName = prompt('Rename tab:', tab.name)
+      if (newName && newName.trim()) {
+        this.renameTab(tabId, newName.trim())
+      }
+    }
+
+    handleTabContextMenu(tabId, event) {
+      // Simple context menu using browser's prompt for now
+      const tab = this.tabs.find(t => t.id === tabId)
+      if (!tab) return
+
+      const action = prompt('Tab actions:\n1. Rename\n2. Close\n3. Close Others\n\nEnter number:', '1')
+
+      if (action === '1') {
+        const newName = prompt('Rename tab:', tab.name)
+        if (newName && newName.trim()) {
+          this.renameTab(tabId, newName.trim())
+        }
+      } else if (action === '2') {
+        this.closeTab(tabId)
+      } else if (action === '3') {
+        this.closeOtherTabs(tabId)
+      }
+    }
+
+    handleNewTabClick() {
+      this.createTab(this.generateTabName(), '')
+    }
+
+    // Close all tabs except the specified one
+    closeOtherTabs(keepTabId) {
+      const tabsToClose = this.tabs.filter(t => t.id !== keepTabId)
+
+      for (const tab of tabsToClose) {
+        if (tab.editor && tab.editor.destroy) {
+          tab.editor.destroy()
+        }
+      }
+
+      this.tabs = this.tabs.filter(t => t.id === keepTabId)
+      this.activeTabId = keepTabId
+
+      this.renderTabsBar()
+      this.saveTabs()
+    }
+
+    // Navigate to next tab
+    switchToNextTab() {
+      const currentIndex = this.tabs.findIndex(t => t.id === this.activeTabId)
+      const nextIndex = (currentIndex + 1) % this.tabs.length
+      this.switchTab(this.tabs[nextIndex].id)
+    }
+
+    // Navigate to previous tab
+    switchToPreviousTab() {
+      const currentIndex = this.tabs.findIndex(t => t.id === this.activeTabId)
+      const prevIndex = (currentIndex - 1 + this.tabs.length) % this.tabs.length
+      this.switchTab(this.tabs[prevIndex].id)
+    }
+
+    // Close active tab
+    closeActiveTab() {
+      if (this.activeTabId) {
+        this.closeTab(this.activeTabId)
+      }
+    }
+  }
+
+  // Initialize after functions are defined
+  initUI()
+
+  const article = document.querySelector('article')
+  const tabManager = new TabManager(article)
+
+  article.addEventListener('input', debounce(500, save))
+  article.addEventListener('blur', save)
+  article.addEventListener('click', event => {
+    if (event.target.tagName === 'A') window.open(event.target.getAttribute('href'), '_blank')
+  })
+  addEventListener('DOMContentLoaded', load)
+  // Removed hashchange listener - tabs are loaded via DOMContentLoaded only
+  addEventListener('load', () => new MutationObserver(save).observe(article, {attributeFilter: ['style']}))
+  addEventListener('keydown', e => {
+    // Tab navigation shortcuts
+    if (e.ctrlKey && e.code === 'Tab') {
+      e.preventDefault()
+      if (e.shiftKey) {
+        tabManager.switchToPreviousTab()
+      } else {
+        tabManager.switchToNextTab()
+      }
+    }
+    // Close tab
+    else if (e.ctrlKey && e.code === 'KeyW') {
+      e.preventDefault()
+      tabManager.closeActiveTab()
+    }
+    // New tab (prevent default browser behavior)
+    else if (e.ctrlKey && e.code === 'KeyT') {
+      e.preventDefault()
+      tabManager.createTab(tabManager.generateTabName(), '')
+    }
+    // Save shortcuts
+    else if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.code === 'KeyS') {
+      e.preventDefault()
+      toggleSnippetsPanel()
+    } else if ((e.metaKey || e.ctrlKey) && e.code === 'KeyS') {
+      e.preventDefault()
+      downloadHTML()
+    }
+  })
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+  }
+
+  console.log('%cGitHub https://github.com/antonmedv/textarea', 'font-size: 16px; border: 1px solid lightblue; border-radius: 12px; padding: 10px 14px; ')
 </script>
 <svg style="display: none" aria-hidden="true" focusable="false">
   <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor"
