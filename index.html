@@ -2121,6 +2121,7 @@ else:
         const stdout = []
         const stderr = []
 
+        let isFirstStdoutChunk = true
         py.setStdout({
           batched: (text) => {
             stdout.push(text)
@@ -2128,7 +2129,14 @@ else:
             const currentOutput = outputContent.textContent || ''
             const errorDiv = outputContent.querySelector('.output-error')
             if (!errorDiv) {
-              outputContent.textContent = currentOutput + text
+              let formattedText = text
+              if (isFirstStdoutChunk) {
+                if (currentOutput && !currentOutput.endsWith('\n') && !text.startsWith('\n')) {
+                  formattedText = `\n${text}`
+                }
+                isFirstStdoutChunk = false
+              }
+              outputContent.textContent = currentOutput + formattedText
               outputConsole.classList.add('visible')
             }
           }
