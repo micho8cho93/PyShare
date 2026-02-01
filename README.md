@@ -9,6 +9,7 @@ A _minimalist_ Python code editor that lives entirely in your browser and stores
 ## Features
 
 - 🐍 **Python Support** – Full Python syntax highlighting and execution
+- 📊 **Data Visualization** – Create plots with matplotlib and numpy
 - 🗜️ **Compression** – Your code gets compressed with deflate
 - 🔗 **URL hash** – Share your Python code by copying a URL
 - ▶️ **Run Python** – Execute Python code directly in the browser with Pyodide
@@ -181,6 +182,137 @@ print(f"Email: {email}")
 print(f"Password: {'*' * len(password)}")
 ```
 
+## Data Visualization with Matplotlib
+
+### 📊 Creating Plots and Charts
+
+PyShare now supports data visualization using matplotlib! Create beautiful charts and graphs that render directly in the output console.
+
+**How it works:**
+1. Write Python code that uses matplotlib to create plots
+2. Run the code using the "Run Python" button
+3. Plots automatically appear as images in the output console
+4. Multiple plots are displayed in sequence
+
+**Example:**
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Create data
+x = np.linspace(0, 10, 100)
+y = np.sin(x)
+
+# Create plot
+plt.plot(x, y)
+plt.title('Sine Wave')
+plt.xlabel('X axis')
+plt.ylabel('Y axis')
+plt.grid(True)
+plt.show()
+
+print("Plot generated successfully!")
+```
+
+### 📈 Visualization Features
+
+- **Automatic package loading**: matplotlib and numpy load automatically on first run
+- **Inline rendering**: Plots appear as PNG images in the output console
+- **Multiple plots**: Create multiple figures in one script - all will be displayed
+- **High quality**: Images are rendered at 100 DPI with tight bounding boxes
+- **Responsive**: Plots scale to fit the output console width
+- **Mixed output**: Combine print statements with plots for annotated visualizations
+
+### 🎯 Try It Out
+
+Click menu → **"Plotting Example"** to load a ready-to-run matplotlib example!
+
+### 💡 Plotting Ideas
+
+**Multiple subplots:**
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 10, 100)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+
+ax1.plot(x, np.sin(x))
+ax1.set_title('Sine')
+ax1.grid(True)
+
+ax2.plot(x, np.cos(x), 'r')
+ax2.set_title('Cosine')
+ax2.grid(True)
+
+plt.tight_layout()
+plt.show()
+```
+
+**Bar chart:**
+```python
+import matplotlib.pyplot as plt
+
+languages = ['Python', 'JavaScript', 'Java', 'C++', 'Go']
+popularity = [85, 78, 65, 60, 45]
+
+plt.bar(languages, popularity, color='steelblue')
+plt.title('Programming Language Popularity')
+plt.ylabel('Popularity Score')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+```
+
+**Scatter plot with colors:**
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Generate random data
+np.random.seed(42)
+x = np.random.randn(100)
+y = np.random.randn(100)
+colors = np.random.rand(100)
+sizes = 1000 * np.random.rand(100)
+
+plt.scatter(x, y, c=colors, s=sizes, alpha=0.5, cmap='viridis')
+plt.colorbar()
+plt.title('Random Scatter Plot')
+plt.xlabel('X values')
+plt.ylabel('Y values')
+plt.show()
+```
+
+**Histogram:**
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Generate random data
+data = np.random.randn(1000)
+
+plt.hist(data, bins=30, edgecolor='black', alpha=0.7)
+plt.title('Normal Distribution')
+plt.xlabel('Value')
+plt.ylabel('Frequency')
+plt.grid(True, alpha=0.3)
+plt.show()
+
+print(f"Mean: {data.mean():.2f}")
+print(f"Std: {data.std():.2f}")
+```
+
+### ⚠️ First Run Notice
+
+**Loading matplotlib (first time only):**
+- matplotlib is ~9MB and loads on first Python execution
+- You'll see "Loading matplotlib and numpy..." message
+- First run may take 10-30 seconds depending on connection
+- The package is cached - subsequent runs are instant!
+- If matplotlib fails to load, check your internet connection
+
 ## URL Sharing Functionality
 
 ### 🔗 Share Your Python Code
@@ -321,6 +453,31 @@ print("Even squares:", even_squares)
 # Dictionary comprehension
 word_lengths = {word: len(word) for word in ["python", "code", "editor"]}
 print("Word lengths:", word_lengths)
+```
+
+### Example 6: Data Visualization
+```python
+# Create a simple plot
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Generate data
+x = np.linspace(0, 10, 100)
+y1 = np.sin(x)
+y2 = np.cos(x)
+
+# Create plot with multiple lines
+plt.figure(figsize=(10, 6))
+plt.plot(x, y1, label='sin(x)', linewidth=2)
+plt.plot(x, y2, label='cos(x)', linewidth=2, linestyle='--')
+plt.title('Trigonometric Functions')
+plt.xlabel('X axis')
+plt.ylabel('Y axis')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+
+print("Visualization complete!")
 ```
 
 ## Pro Tips

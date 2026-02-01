@@ -1247,6 +1247,12 @@
     </svg>
     Interactive Example
   </button>
+  <button class="item" id="plotting-example" role="menuitem">
+    <svg aria-hidden="true" focusable="false" width="22" height="22">
+      <use xlink:href="#icon-empty"></use>
+    </svg>
+    Plotting Example
+  </button>
   <button class="item" id="theme-toggle" role="menuitem">
     <svg aria-hidden="true" focusable="false" width="22" height="22">
       <use xlink:href="#icon-theme"></use>
@@ -1947,6 +1953,36 @@
       outputConsole.classList.add('visible')
     }
 
+    function showOutputWithPlots(content, figures = [], isError = false) {
+      outputContent.innerHTML = ''
+
+      // Add text output if present
+      if (content && content.trim()) {
+        const pre = document.createElement('pre')
+        pre.className = isError ? 'output-error' : ''
+        pre.textContent = content
+        outputContent.appendChild(pre)
+      }
+
+      // Add plots
+      if (figures && figures.length > 0) {
+        figures.forEach((figureBase64, index) => {
+          const img = document.createElement('img')
+          img.src = `data:image/png;base64,${figureBase64}`
+          img.className = 'output-plot'
+          img.alt = `Plot ${index + 1}`
+          img.style.maxWidth = '100%'
+          img.style.height = 'auto'
+          img.style.marginTop = '10px'
+          img.style.marginBottom = '10px'
+          img.style.display = 'block'
+          outputContent.appendChild(img)
+        })
+      }
+
+      outputConsole.classList.add('visible')
+    }
+
     function hideOutput() {
       outputConsole.classList.remove('visible')
     }
@@ -2009,6 +2045,31 @@ else:
       hideMenu()
     })
 
+    const plottingExample = document.querySelector('#plotting-example')
+    plottingExample.addEventListener('click', event => {
+      event.preventDefault()
+      const exampleCode = `import matplotlib.pyplot as plt
+import numpy as np
+
+# Create data
+x = np.linspace(0, 10, 100)
+y = np.sin(x)
+
+# Create plot
+plt.plot(x, y)
+plt.title('Sine Wave')
+plt.xlabel('X axis')
+plt.ylabel('Y axis')
+plt.grid(True)
+plt.show()
+
+print("Plot generated successfully!")`
+      editor.set(exampleCode)
+      save()
+      notify('Plotting example loaded')
+      hideMenu()
+    })
+
     fileInput.addEventListener('change', event => {
       const file = event.target.files[0]
       if (file) {
@@ -2036,6 +2097,7 @@ else:
     let pyodide = null
     let pyodideLoadFailed = false
     let pyodideLoadPromise = null
+    let matplotlibLoaded = false
     let lintTimeout = null
     let isLinting = false
 
@@ -2048,7 +2110,8 @@ else:
         }
 
         const script = document.createElement('script')
-        script.src = 'https://unpkg.com/pyodide@0.25.0/pyodide.js'
+        // Use jsdelivr.net CDN instead of unpkg.com for better CORS support
+        script.src = 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js'
         script.async = true
         script.onload = () => resolve()
         script.onerror = () => reject(new Error('Failed to load Pyodide library. Please check your internet connection or disable ad-blockers.'))
@@ -2065,7 +2128,7 @@ else:
         // Wait for existing load to complete using the promise
         return pyodideLoadPromise
       }
-      
+
       pyodideLoadPromise = (async () => {
         try {
           const outputInfoDiv = document.createElement('div')
@@ -2074,23 +2137,23 @@ else:
           outputContent.innerHTML = ''
           outputContent.appendChild(outputInfoDiv)
           outputConsole.classList.add('visible')
-          
+
           // Load Pyodide script
           await loadPyodideScript()
-          
-          // Initialize Pyodide
-          pyodide = await window.loadPyodide()
-          
-          // Clear the loading message only if it's still the only content
-          if (outputContent.childNodes.length === 1 && outputContent.firstChild === outputInfoDiv) {
-            outputInfoDiv.textContent = 'Python environment loaded successfully!'
-            setTimeout(() => {
-              if (outputContent.childNodes.length === 1 && outputContent.firstChild === outputInfoDiv) {
-                hideOutput()
-              }
-            }, 1000)
-          }
-          
+
+          // Initialize Pyodide with jsdelivr CDN for better CORS support
+          pyodide = await window.loadPyodide({
+            indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/'
+          })
+
+          // Clear the loading message after a short delay
+          outputInfoDiv.textContent = 'Python environment loaded successfully!'
+          setTimeout(() => {
+            if (outputContent.childNodes.length === 1 && outputContent.firstChild === outputInfoDiv) {
+              hideOutput()
+            }
+          }, 1000)
+
           return pyodide
         } catch (error) {
           pyodideLoadFailed = true
@@ -2099,14 +2162,139 @@ else:
           throw error
         }
       })()
-      
+
       return pyodideLoadPromise
+    }
+
+    async function ensureMatplotlibLoaded(py) {
+      if (matplotlibLoaded) {
+        console.log('Matplotlib already loaded')
+        return true
+      }
+
+      console.log('Loading matplotlib and numpy...')
+
+      try {
+        const outputInfoDiv = document.createElement('div')
+        outputInfoDiv.className = 'output-info'
+        outputInfoDiv.textContent = 'Loading matplotlib and numpy (this may take 30-60 seconds)...'
+        outputContent.innerHTML = ''
+        outputContent.appendChild(outputInfoDiv)
+        outputConsole.classList.add('visible')
+
+        // Check if we're running from file:// protocol
+        if (window.location.protocol === 'file:') {
+          throw new Error('PyShare must be served through an HTTP server to use matplotlib.\n\nPlease run: python3 -m http.server 8080\nThen open: http://localhost:8080/index.html')
+        }
+
+        // First, ensure micropip is loaded
+        console.log('Loading micropip...')
+        outputInfoDiv.textContent = 'Loading package manager...'
+        await py.loadPackage('micropip')
+        console.log('Micropip loaded successfully')
+
+        console.log('Installing matplotlib and numpy...')
+        outputInfoDiv.textContent = 'Installing matplotlib and numpy (30-60 seconds)...'
+
+        // Use micropip to install matplotlib and numpy
+        await py.runPythonAsync(`
+import micropip
+# Install matplotlib (this also installs numpy as a dependency)
+await micropip.install('matplotlib')
+print('Matplotlib installation complete')
+`)
+
+        console.log('Package installation complete')
+        outputInfoDiv.textContent = 'Verifying installation...'
+
+        // Configure matplotlib for inline rendering
+        console.log('Configuring matplotlib...')
+        outputInfoDiv.textContent = 'Configuring matplotlib...'
+        await py.runPythonAsync(`
+import matplotlib
+import matplotlib.pyplot as plt
+import io
+import base64
+
+# Use Agg backend for image rendering
+matplotlib.use('Agg')
+
+# Store all figure images
+_figures = []
+
+def _capture_figures():
+    """Capture all matplotlib figures as base64 PNG images"""
+    global _figures
+    _figures = []
+
+    # Get all figure numbers
+    figs = [plt.figure(n) for n in plt.get_fignums()]
+
+    for fig in figs:
+        # Save figure to bytes buffer
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png', bbox_inches='tight', dpi=100)
+        buf.seek(0)
+
+        # Convert to base64
+        img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+        _figures.append(img_base64)
+        buf.close()
+
+    # Close all figures to free memory
+    plt.close('all')
+
+    return _figures
+
+# Override plt.show() to capture figures instead
+_original_show = plt.show
+def _custom_show(*args, **kwargs):
+    """Custom show function that captures figures"""
+    pass  # Don't actually show, just capture later
+
+plt.show = _custom_show
+`)
+        console.log('Matplotlib configured successfully')
+
+        matplotlibLoaded = true
+        outputInfoDiv.textContent = 'Matplotlib loaded successfully! Running code...'
+
+        // Wait a bit so user sees the success message
+        await new Promise(resolve => setTimeout(resolve, 800))
+
+        return true
+      } catch (error) {
+        console.error('Failed to load matplotlib:', error)
+        console.error('Error details:', error.message, error.stack)
+        matplotlibLoaded = false
+
+        // Show detailed error message
+        const errorMsg = `Error loading matplotlib:
+${error.message}
+
+${error.stack || ''}
+
+This could be due to:
+- No internet connection
+- Network firewall blocking CDN access
+- Browser blocking the request
+- Ad blocker or privacy extension blocking requests
+
+Please:
+1. Check your internet connection
+2. Disable browser extensions temporarily
+3. Try a different browser
+4. Check if your firewall allows access to unpkg.com and pypi.org`
+
+        showOutput(errorMsg, true)
+        return false
+      }
     }
 
     async function runPythonCode() {
       try {
         runPython.classList.add('loading')
-        
+
         const code = article.textContent
         if (!code.trim()) {
           showOutput('No code to execute', false)
@@ -2116,6 +2304,17 @@ else:
 
         // Initialize Pyodide if not already loaded
         const py = await initPyodide()
+
+        // Check if code uses matplotlib and load it if needed
+        if (code.includes('matplotlib') || code.includes('plt') || code.includes('numpy') || code.includes('np')) {
+          const loaded = await ensureMatplotlibLoaded(py)
+          if (!loaded) {
+            // Error message already shown by ensureMatplotlibLoaded
+            runPython.classList.remove('loading')
+            hideMenu()
+            return
+          }
+        }
 
         // Capture stdout and stderr
         const stdout = []
@@ -2190,13 +2389,24 @@ await __main__()
         try {
           await py.runPythonAsync(wrappedCode)
 
+          // Capture any matplotlib figures if matplotlib is loaded
+          let figures = []
+          if (matplotlibLoaded) {
+            try {
+              figures = await py.runPythonAsync('_capture_figures()')
+            } catch (e) {
+              // No figures to capture or error capturing
+              console.log('No figures to capture:', e)
+            }
+          }
+
           const output = stdout.join('')
           const errors = stderr.join('')
 
           if (errors) {
-            showOutput(errors, true)
-          } else if (output) {
-            showOutput(output, false)
+            showOutputWithPlots(errors, figures, true)
+          } else if (output || figures.length > 0) {
+            showOutputWithPlots(output || 'Code executed successfully', figures, false)
           } else {
             showOutput('Code executed successfully (no output)', false)
           }
